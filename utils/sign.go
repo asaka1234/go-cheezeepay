@@ -10,6 +10,8 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/samber/lo"
+	"github.com/spf13/cast"
 	"sort"
 	"strings"
 )
@@ -42,21 +44,20 @@ func VerifySign(params map[string]interface{}, publicKey string) (bool, error) {
 //----------------------------
 
 // The string for the reception signature
+// 是value的拼接
 func GetContent(params map[string]interface{}) string {
-	keys := make([]string, 0, len(params))
-	for k := range params {
-		keys = append(keys, k)
-	}
+	keys := lo.Keys(params)
 	sort.Strings(keys)
 
 	var builder strings.Builder
 	for _, name := range keys {
+		//遍历每一个key
 		if params[name] != nil && name != "payeeAccountInfos" {
 			if name == "agentOrderBatch" {
-				// Skip or handle JSON serialization if needed
 				// builder.WriteString(JSON.toJSONString(params.get(name)))
 			} else {
-				builder.WriteString(fmt.Sprintf("%v", params[name]))
+				//直接做value的拼接
+				builder.WriteString(cast.ToString(params[name]))
 			}
 		}
 	}
@@ -65,10 +66,7 @@ func GetContent(params map[string]interface{}) string {
 
 // Spell the string of the signature to be verified
 func GetContentNew(params map[string]interface{}) string {
-	keys := make([]string, 0, len(params))
-	for k := range params {
-		keys = append(keys, k)
-	}
+	keys := lo.Keys(params)
 	sort.Strings(keys)
 
 	var builder strings.Builder
@@ -113,6 +111,7 @@ func isEmpty(value interface{}) bool {
 
 // Generate a signature using a private key
 func Sign(textContent, privateKeyStr string) (string, error) {
+
 	block, _ := pem.Decode([]byte(privateKeyStr))
 	if block == nil {
 		return "", errors.New("failed to parse PEM block containing the private key")

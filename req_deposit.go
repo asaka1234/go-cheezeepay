@@ -11,6 +11,7 @@ import (
 func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse, error) {
 
 	rawURL := cli.DepositURL
+	
 	// 1. 拿到请求参数，转为map
 	var signDataMap map[string]interface{}
 	mapstructure.Decode(req, &signDataMap)
@@ -19,6 +20,7 @@ func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse
 	signDataMap["takerType"] = "2"
 	signDataMap["coin"] = "USDT"
 	signDataMap["tradeType"] = "2"
+	signDataMap["language"] = "en" //TODO 先写死
 
 	// 2. 计算签名,补充参数
 	signStr, _ := utils.GetSign(signDataMap, cli.RSAPrivateKey) //私钥加密

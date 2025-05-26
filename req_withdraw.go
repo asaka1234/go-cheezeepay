@@ -10,15 +10,17 @@ import (
 // https://pay-apidoc-en.cheezeebit.com/#p2p-payout-order
 func (cli *Client) Withdraw(req CheezeePayWithdrawReq) (*CheezeePayWithdrawResp, error) {
 
-	rawURL := cli.DepositURL
+	rawURL := cli.WithdrawURL
+
 	// 1. 拿到请求参数，转为map
 	var signDataMap map[string]interface{}
 	mapstructure.Decode(req, &signDataMap)
 	signDataMap["merchantsId"] = cli.MerchantID
-	signDataMap["pushAddress"] = cli.DepositCallbackURL
+	signDataMap["pushAddress"] = cli.WithdrawCallbackURL
 	signDataMap["takerType"] = "2"
 	signDataMap["coin"] = "USDT"
 	signDataMap["tradeType"] = "1"
+	signDataMap["language"] = "en" //TODO 先写死
 
 	// 2. 计算签名,补充参数
 	signStr, _ := utils.GetSign(signDataMap, cli.RSAPrivateKey) //私钥加密

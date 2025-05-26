@@ -1,6 +1,6 @@
 文档
 =============
-https://github.com/lifeonearth718/payoucard-doc/blob/main/API-CN.md#%E9%93%B6%E8%A1%8C%E5%8D%A1%E5%85%85%E5%80%BC
+https://pay-apidoc-en.cheezeebit.com/#cheezee-pay-api
 
 鉴权
 ==============
@@ -9,15 +9,9 @@ https://github.com/lifeonearth718/payoucard-doc/blob/main/API-CN.md#%E9%93%B6%E8
 
 回调地址
 ==============
-是提前让payouCard配置好的, 故而无法api中动态修改
 
 
 Comment
 ===============
-1. only support withdrawl
+1. only support deposit
 2. 所有接口都是 application/json 格式的
-
-整体流程
-=============
-1调用withdraw接口来发起提现. 要对发送的Body里的data参数:排序后用privateKey算一个签名一起发过去
-2回调也是有sign签名的,需要用publicKey解密来验证正确性

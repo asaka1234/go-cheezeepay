@@ -1,7 +1,7 @@
-package go_payoucard
+package go_cheezeepay
 
 import (
-	"github.com/asaka1234/go-payoucard/utils"
+	"github.com/asaka1234/go-cheezeepay/utils"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -10,18 +10,20 @@ type Client struct {
 	RSAPublicKey  string // 公钥
 	RSAPrivateKey string // 私钥
 
-	WithdrawURL string
+	DepositURL         string
+	DepositCallbackURL string
 
 	ryClient *resty.Client
 	logger   utils.Logger
 }
 
-func NewClient(logger utils.Logger, merchantID string, rsaPublicKey, rsaPrivateKey, withdrawURL string) *Client {
+func NewClient(logger utils.Logger, merchantID string, rsaPublicKey, rsaPrivateKey, depositURL, depositCallbackURL string) *Client {
 	return &Client{
-		MerchantID:    merchantID,
-		RSAPublicKey:  rsaPublicKey,
-		RSAPrivateKey: rsaPrivateKey,
-		WithdrawURL:   withdrawURL,
+		MerchantID:         merchantID,
+		RSAPublicKey:       rsaPublicKey,
+		RSAPrivateKey:      rsaPrivateKey,
+		DepositURL:         depositURL,
+		DepositCallbackURL: depositCallbackURL,
 
 		ryClient: resty.New(), //client实例
 		logger:   logger,

@@ -1,4 +1,4 @@
-package go_payoucard
+package go_cheezeepay
 
 func getHeaders() map[string]string {
 	return map[string]string{

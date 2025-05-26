@@ -1,4 +1,4 @@
-module github.com/asaka1234/go-payoucard
+module github.com/asaka1234/go-cheezeepay
 
 go 1.24.2
 

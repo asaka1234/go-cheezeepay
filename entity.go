@@ -1,68 +1,68 @@
-package go_payoucard
+package go_cheezeepay
 
 // ---------------------------------------------
-// 这个是业务上游请求参数
-type PayOuCardRechargeReq struct {
-	UniqueID string  `json:"uniqueId" mapstructure:"uniqueId"` //合作商用户的唯一ID (merchantId)
-	CardNo   string  `json:"cardNo" mapstructure:"cardNo"`     //银行卡号
-	Currency string  `json:"currency" mapstructure:"currency"` //币种(默认USDT)
-	Amount   float64 `json:"amount" mapstructure:"amount"`     //充值金额
-	OrderNo  string  `json:"orderNo" mapstructure:"orderNo"`   //商户订单号
+type CheezeePayDepositReq struct {
+	CustomerMerchantsId string `json:"customerMerchantsId" mapstructure:"customerMerchantsId"` //商户侧的uid
+	LegalCoin           string `json:"legalCoin" mapstructure:"legalCoin"`                     //法定货币. 只支持: INR IDR
+	MerchantOrderId     string `json:"merchantOrderId" mapstructure:"merchantOrderId"`         //商户订单号
+	DealAmount          string `json:"dealAmount" mapstructure:"dealAmount"`                   //数量
+	Language            string `json:"language" mapstructure:"language"`                       //zh_hk Chinese；VI Vietnamese；en English；Indonesia Indonesian
+	//MerchantHomePage    string `json:"merchantHomePage" mapstructure:"merchantHomePage"` //非必须
+	//以下sdk来赋值
+	//MerchantsId string `json:"merchantsId" mapstructure:"merchantsId"` //商户id
+	//PushAddress string `json:"pushAddress" mapstructure:"pushAddress"` //回调地址
+	//TakerType   string `json:"takerType" mapstructure:"takerType"`     // Fixed: 2
+	//Coin        string `json:"coin" mapstructure:"coin"`               //Fixed: USDT
+	//TradeType   string `json:"tradeType" mapstructure:"tradeType"`     //Fixed: 2
+	//PlatSign    string `json:"platSign" mapstructure:"platSign"`       //签名(rsa私钥加密)
 }
 
-// 这个是实际发送给上游api的
-type PayOuCardRechargeAPIReq struct {
-	RequestID  string               `json:"requestId" mapstructure:"requestId"`   // 请求流水id。20位随机字符
-	Data       PayOuCardRechargeReq `json:"data" mapstructure:"data"`             // 业务数据
-	MerchantID string               `json:"merchantId" mapstructure:"merchantId"` // 商户ID。PayouCard为商户分配
-	Signature  string               `json:"signature" mapstructure:"signature"`   // 签名 这个不用业务传.而是sdk来计算
+//-------------------------------
+
+type CheezeePayDepositResponse struct {
+	Success  bool                           `json:"success" mapstructure:"success"`
+	Code     string                         `json:"code" mapstructure:"code"` // 000000 成功
+	Msg      string                         `json:"msg" mapstructure:"msg"`
+	Data     *CheezeePayDepositResponseData `json:"data,omitempty" mapstructure:"data"`
+	ErrorMsg string                         `json:"errorMsg,omitempty" mapstructure:"errorMsg"`
+	PlatSign *string                        `json:"platSign,omitempty" mapstructure:"platSign"` //签名,需要校验. 要用rsa 公钥
 }
 
-// response
-type PayOuCardRechargeRsp struct {
-	Code       int                       `json:"code"`
-	Message    string                    `json:"message"`
-	Success    bool                      `json:"success"` //是否成功。true：成功；false：失败。 当code=0时为true
-	Data       *PayOuCardRechargeRspData `json:"data"`
-	RequestID  string                    `json:"requestId"`
-	MerchantID string                    `json:"merchantId"`
-	Signature  string                    `json:"signature"`
-}
-
-type PayOuCardRechargeRspData struct {
-	Status         int     `json:"status"`         //卡片充值状态。1：成功；2：失败；3：处理中
-	CardNo         string  `json:"cardNo"`         //卡号
-	OrderNo        string  `json:"orderNo"`        //商户订单号
-	Currency       string  `json:"currency"`       //币种
-	RechargeAmount float64 `json:"rechargeAmount"` //充值金额
-	ReceivedAmount float64 `json:"receivedAmount"` //到账金额
-	Fee            float64 `json:"fee"`            //手续费(扣充值金额之外的钱)
-	Msg            string  `json:"msg"`
+type CheezeePayDepositResponseData struct {
+	OrderId string `json:"orderId" mapstructure:"orderId"`
+	Type    int    `json:"type" mapstructure:"type"` // 0 for new order, 1 for existing order
+	Url     string `json:"url" mapstructure:"url"`
 }
 
 //--------------callback------------------------------
 
-type PayOuCardRechargeBackReq struct {
-	RequestID  string                       `json:"requestId" mapstructure:"requestId"`   // 请求流水id。20位随机字符
-	MerchantID string                       `json:"merchantId" mapstructure:"merchantId"` // 商户ID
-	NotifyType int                          `json:"notifyType" mapstructure:"notifyType"` // 通知类型 此通知notifyType = 4
-	Data       PayOuCardRechargeBackReqData `json:"data" mapstructure:"data"`             // 提现数据
-	Signature  string                       `json:"signature" mapstructure:"signature"`   // 签名
+type CheezeePayDepositBackReq struct {
+	MerchantsOrderId string                        `json:"merchantsOrderId" mapstructure:"merchantsOrderId"` //商户订单号
+	OrderId          string                        `json:"orderId" mapstructure:"orderId"`                   //psp的订单号
+	MerchantId       string                        `json:"merchantId" mapstructure:"merchantId"`             //商户号
+	Data             *CheezeePayDepositBackReqData `json:"data,omitempty" mapstructure:"data"`
 }
 
-type PayOuCardRechargeBackReqData struct {
-	CardNo         string  `json:"cardNo" mapstructure:"cardNo"`
-	Status         int     `json:"status" mapstructure:"status"`   //卡片充值状态。1：成功；2：失败；
-	OrderNo        string  `json:"orderNo" mapstructure:"orderNo"` //商户订单号
-	Currency       string  `json:"currency" mapstructure:"currency"`
-	RechargeAmount float64 `json:"rechargeAmount" mapstructure:"rechargeAmount"`
-	ReceivedAmount float64 `json:"receivedAmount" mapstructure:"receivedAmount"` //option
-	Fee            float64 `json:"fee" mapstructure:"fee"`
-	Msg            string  `json:"msg" mapstructure:"msg"` //option
+type CheezeePayDepositBackReqData struct {
+	OrderId             string `json:"orderId" mapstructure:"orderId"`
+	Status              string `json:"status" mapstructure:"status"` //4 for success, 5 for failure, 6 for failure (user has not operated for 6 hours), 7 for failure (price not accepted), 9 for failure (refund)
+	Coin                string `json:"coin" mapstructure:"coin"`
+	DealAmount          string `json:"dealAmount" mapstructure:"dealAmount"`
+	DealQuantity        string `json:"dealQuantity" mapstructure:"dealQuantity"`
+	EntrustOrderId      string `json:"entrustOrderId" mapstructure:"entrustOrderId"`
+	FeeCoin             string `json:"feeCoin" mapstructure:"feeCoin"`
+	LegalCoin           string `json:"legalCoin" mapstructure:"legalCoin"`
+	Price               string `json:"price" mapstructure:"price"`
+	TakerFee            string `json:"takerFee" mapstructure:"takerFee"`
+	TakerId             string `json:"takerId" mapstructure:"takerId"`
+	TakerName           string `json:"takerName" mapstructure:"takerName"`
+	TradeType           string `json:"tradeType" mapstructure:"tradeType"`
+	PayWayName          string `json:"payWayName" mapstructure:"payWayName"`
+	Side                string `json:"side" mapstructure:"side"`
+	CustomerMerchantsId string `json:"customerMerchantsId" mapstructure:"customerMerchantsId"`
 }
 
 // 给callback的response
-type PayOuCardRechargeBackResp struct {
-	Code    int    `json:"code"`    // 响应状态码
-	Message string `json:"message"` // 响应消息
+type CheezeePayDepositBackResp struct {
+	Code int `json:"code"` // 响应状态码  200成功
 }

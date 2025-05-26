@@ -1,90 +1,164 @@
 package utils
 
 import (
-	"encoding/json"
+	"crypto"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/sha256"
+	"crypto/x509"
+	"encoding/base64"
+	"encoding/pem"
+	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/samber/lo"
-	"github.com/spf13/cast"
 	"sort"
 	"strings"
 )
 
-func Sign(paramMap map[string]interface{}, privateKey string) string {
+const (
+	DATA = "data"
+)
 
-	keys := lo.Keys(paramMap)
-	// 1. 参数名按照ASCII码表升序排序
-	sort.Strings(keys)
-
-	//拼接签名原始字符串
-	//rawString := ""
-	var pairs []string
-	lo.ForEach(keys, func(x string, index int) {
-		value := ""
-		if x == "data" {
-			//data字段(是一个map.先转成string)
-			valueByte, _ := json.Marshal(paramMap[x])
-			value = string(valueByte)
-		} else {
-			value = cast.ToString(paramMap[x])
-		}
-
-		if value != "" {
-			pairs = append(pairs, x+"="+value)
-		}
-	})
-	queryString := strings.Join(pairs, "&") // values.Encode()
-
-	fmt.Printf("[rawString]%s\n", queryString)
-
-	//4. 计算RSA签名
-	signResult, err := SignSHA256RSA([]byte(queryString), privateKey)
-	if err != nil {
-		fmt.Printf("==sign===>%s\n", err.Error())
-	}
-	return signResult
+// Generate signature
+func GetSign(params map[string]interface{}, privateKey string) (string, error) {
+	delete(params, "sign")
+	textContent := GetContent(params)
+	fmt.Println("Signing content:", textContent)
+	return Sign(textContent, privateKey)
 }
 
-func VerifySign(paramMap map[string]interface{}, publicKey string, sign string) bool {
+// Verify the signature
+func VerifySign(params map[string]interface{}, publicKey string) (bool, error) {
+	platSign, ok := params["platSign"].(string)
+	if !ok {
+		return false, errors.New("platSign not found or not a string")
+	}
+	delete(params, "platSign")
 
-	keys := lo.Keys(paramMap)
+	textContent := GetContentNew(params)
+	fmt.Println("Signature Verification:", textContent)
+	return VerifySignature(textContent, platSign, publicKey)
+}
 
-	// 1. 参数名按照ASCII码表升序排序
+//----------------------------
+
+// The string for the reception signature
+func GetContent(params map[string]interface{}) string {
+	keys := make([]string, 0, len(params))
+	for k := range params {
+		keys = append(keys, k)
+	}
 	sort.Strings(keys)
 
-	//拼接签名原始字符串
-	//rawString := ""
-	var pairs []string
-	lo.ForEach(keys, func(x string, index int) {
-		value := ""
-		if x == "data" {
-			//data字段(是一个map.先转成string)
-			valueByte, _ := json.Marshal(paramMap[x])
-			value = string(valueByte)
-		} else {
-			value = cast.ToString(paramMap[x])
+	var builder strings.Builder
+	for _, name := range keys {
+		if params[name] != nil && name != "payeeAccountInfos" {
+			if name == "agentOrderBatch" {
+				// Skip or handle JSON serialization if needed
+				// builder.WriteString(JSON.toJSONString(params.get(name)))
+			} else {
+				builder.WriteString(fmt.Sprintf("%v", params[name]))
+			}
 		}
-		if value != "" {
-			pairs = append(pairs, x+"="+value)
+	}
+	return builder.String()
+}
+
+// Spell the string of the signature to be verified
+func GetContentNew(params map[string]interface{}) string {
+	keys := make([]string, 0, len(params))
+	for k := range params {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	var builder strings.Builder
+	for _, name := range keys {
+		if !isEmpty(params[name]) {
+			if name == DATA {
+				if dataValue, ok := params[name].(map[string]interface{}); ok {
+					builder.WriteString(GetContentNew(dataValue))
+				} else {
+					builder.WriteString(fmt.Sprintf("%v", params[name]))
+				}
+			} else if name == "payeeAccountInfos" {
+				if strValue, ok := params[name].(string); ok {
+					builder.WriteString(strValue)
+				}
+			} else {
+				if params[name] != nil {
+					builder.WriteString(fmt.Sprintf("%v", params[name]))
+				}
+			}
 		}
-	})
-	queryString := strings.Join(pairs, "&")
+	}
+	return builder.String()
+}
 
-	fmt.Printf("[rawString]%s\n", queryString)
-
-	//4. 验证
-	verifyResult, err := VerifySHA256RSA([]byte(queryString), publicKey, sign)
-	if err != nil {
+// Check if value is empty
+func isEmpty(value interface{}) bool {
+	if value == nil {
+		return true
+	}
+	switch v := value.(type) {
+	case string:
+		return v == ""
+	case map[string]interface{}:
+		return len(v) == 0
+	case []interface{}:
+		return len(v) == 0
+	default:
 		return false
 	}
-
-	return verifyResult
 }
 
-//--------------------------------------------------
+// Generate a signature using a private key
+func Sign(textContent, privateKeyStr string) (string, error) {
+	block, _ := pem.Decode([]byte(privateKeyStr))
+	if block == nil {
+		return "", errors.New("failed to parse PEM block containing the private key")
+	}
 
-// GenRequestID generates request ID
-func GenRequestID() string {
-	return strings.Join(strings.Split(uuid.NewString(), "-"), "")[0:20]
-	//return prefix + time.Now().Format("20060102150405.000")
+	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		return "", err
+	}
+
+	hashed := sha256.Sum256([]byte(textContent))
+	signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, hashed[:])
+	if err != nil {
+		return "", err
+	}
+
+	return base64.StdEncoding.EncodeToString(signature), nil
+}
+
+// Use public key to verify signature
+func VerifySignature(textContent, signStr, publicKeyStr string) (bool, error) {
+	block, _ := pem.Decode([]byte(publicKeyStr))
+	if block == nil {
+		return false, errors.New("failed to parse PEM block containing the public key")
+	}
+
+	publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return false, err
+	}
+
+	rsaPublicKey, ok := publicKey.(*rsa.PublicKey)
+	if !ok {
+		return false, errors.New("not an RSA public key")
+	}
+
+	signature, err := base64.StdEncoding.DecodeString(signStr)
+	if err != nil {
+		return false, err
+	}
+
+	hashed := sha256.Sum256([]byte(textContent))
+	err = rsa.VerifyPKCS1v15(rsaPublicKey, crypto.SHA256, hashed[:], signature)
+	if err != nil {
+		return false, nil
+	}
+
+	return true, nil
 }

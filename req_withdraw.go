@@ -7,8 +7,8 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-// https://pay-apidoc-en.cheezeebit.com/#p2p-payin-order
-func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse, error) {
+// https://pay-apidoc-en.cheezeebit.com/#p2p-payout-order
+func (cli *Client) Withdraw(req CheezeePayWithdrawReq) (*CheezeePayWithdrawResp, error) {
 
 	rawURL := cli.DepositURL
 	// 1. 拿到请求参数，转为map
@@ -18,13 +18,13 @@ func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse
 	signDataMap["pushAddress"] = cli.DepositCallbackURL
 	signDataMap["takerType"] = "2"
 	signDataMap["coin"] = "USDT"
-	signDataMap["tradeType"] = "2"
+	signDataMap["tradeType"] = "1"
 
 	// 2. 计算签名,补充参数
 	signStr, _ := utils.GetSign(signDataMap, cli.RSAPrivateKey) //私钥加密
 	signDataMap["platSign"] = signStr
 
-	var result CheezeePayDepositResponse
+	var result CheezeePayWithdrawResp
 
 	_, err := cli.ryClient.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}).
 		SetCloseConnection(true).
@@ -45,7 +45,7 @@ func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse
 		var signResultMap map[string]interface{}
 		mapstructure.Decode(result, &signResultMap)
 
-		verify, _ := utils.VerifySign(signResultMap, cli.RSAPublicKey) //私钥加密
+		verify, _ := utils.VerifySign(signResultMap, cli.RSAPublicKey) //公钥解密
 		if !verify {
 			return nil, fmt.Errorf("sign verify failed")
 		}

@@ -69,9 +69,9 @@ type CheezeePayDepositBackResp struct {
 //==============================================
 
 type CheezeePayWithdrawReq struct {
-	CustomerMerchantsId  string             `json:"customerMerchantsId" mapstructure:"customerMerchantsId"`
-	LegalCoin            string             `json:"legalCoin" mapstructure:"legalCoin"`             //法定货币. 只支持: INR(印度卢比) IDR(印尼盾)
-	MerchantOrderId      string             `json:"merchantOrderId" mapstructure:"merchantOrderId"` //商户订单号
+	CustomerMerchantsId  string             `json:"customerMerchantsId" mapstructure:"customerMerchantsId"` //商户的userId
+	LegalCoin            string             `json:"legalCoin" mapstructure:"legalCoin"`                     //法定货币. 只支持: INR(印度卢比) IDR(印尼盾)
+	MerchantOrderId      string             `json:"merchantOrderId" mapstructure:"merchantOrderId"`         //商户订单号
 	DealAmount           string             `json:"dealAmount" mapstructure:"dealAmount"`
 	Language             string             `json:"language" mapstructure:"language"`                         //zh_hk Chinese；VI Vietnamese；en English；Indonesia Indonesian
 	TakerName            string             `json:"takerName" mapstructure:"takerName"`                       //[Bank Transfer(India)]
@@ -131,7 +131,7 @@ type WithdrawOrderData struct {
 	TradeType           string `json:"tradeType" mapstructure:"tradeType"`
 	PayWayName          string `json:"payWayName" mapstructure:"payWayName"`
 	Side                string `json:"side" mapstructure:"side"`
-	CustomerMerchantsId string `json:"customerMerchantsId" mapstructure:"customerMerchantsId"`
+	CustomerMerchantsId string `json:"customerMerchantsId" mapstructure:"customerMerchantsId"` ////商户的userId
 }
 
 // 给callback的response

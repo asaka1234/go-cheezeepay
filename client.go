@@ -13,17 +13,22 @@ type Client struct {
 	DepositURL         string
 	DepositCallbackURL string
 
+	WithdrawURL         string
+	WithdrawCallbackURL string
+
 	ryClient *resty.Client
 	logger   utils.Logger
 }
 
-func NewClient(logger utils.Logger, merchantID string, rsaPublicKey, rsaPrivateKey, depositURL, depositCallbackURL string) *Client {
+func NewClient(logger utils.Logger, merchantID string, rsaPublicKey, rsaPrivateKey, depositURL, withdrawURL, depositCallbackURL, withdrawCallbackURL string) *Client {
 	return &Client{
-		MerchantID:         merchantID,
-		RSAPublicKey:       rsaPublicKey,
-		RSAPrivateKey:      rsaPrivateKey,
-		DepositURL:         depositURL,
-		DepositCallbackURL: depositCallbackURL,
+		MerchantID:          merchantID,
+		RSAPublicKey:        rsaPublicKey,
+		RSAPrivateKey:       rsaPrivateKey,
+		DepositURL:          depositURL,
+		DepositCallbackURL:  depositCallbackURL,
+		WithdrawURL:         withdrawURL,
+		WithdrawCallbackURL: withdrawCallbackURL,
 
 		ryClient: resty.New(), //client实例
 		logger:   logger,

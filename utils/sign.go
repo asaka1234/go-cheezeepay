@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
@@ -35,8 +34,9 @@ func (util *CheezeebitRSASignatureUtil) GetContent(paramsMap map[string]interfac
 		value := ""
 		if x != "payeeAccountInfos" {
 			if x == "agentOrderBatch" {
-				valueByte, _ := json.Marshal(paramsMap[x])
-				value = string(valueByte)
+				//官方文档中把这句给注释掉了
+				//valueByte, _ := json.Marshal(paramsMap[x])
+				//value = string(valueByte)
 			} else {
 				value = cast.ToString(paramsMap[x])
 			}

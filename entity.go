@@ -5,7 +5,7 @@ type CheezeePayDepositReq struct {
 	CustomerMerchantsId string `json:"customerMerchantsId" mapstructure:"customerMerchantsId"` //商户侧的uid
 	LegalCoin           string `json:"legalCoin" mapstructure:"legalCoin"`                     //法定货币. 只支持: INR(印度卢比) IDR(印尼盾)
 	MerchantOrderId     string `json:"merchantOrderId" mapstructure:"merchantOrderId"`         //商户订单号
-	DealAmount          string `json:"dealAmount" mapstructure:"dealAmount"`                   //数量
+	DealAmount          string `json:"dealAmount" mapstructure:"dealAmount"`                   //数量，必须是整数. 禁止浮点数，哪怕是2.00也不行 !!!!
 	//以下sdk来赋值
 	//MerchantsId string `json:"merchantsId" mapstructure:"merchantsId"` //商户id
 	//Language            string `json:"language" mapstructure:"language"`                       //zh_hk Chinese；VI Vietnamese；en English；Indonesia Indonesian
@@ -21,7 +21,7 @@ type CheezeePayDepositReq struct {
 type CheezeePayDepositResponse struct {
 	Success  bool                           `json:"success" mapstructure:"success"`
 	Code     string                         `json:"code" mapstructure:"code"` // 000000 成功
-	Msg      string                         `json:"msg" mapstructure:"msg"`
+	Msg      string                         `json:"msg" mapstructure:"msg"`   //success
 	Data     *CheezeePayDepositResponseData `json:"data,omitempty" mapstructure:"data"`
 	ErrorMsg string                         `json:"errorMsg,omitempty" mapstructure:"errorMsg"`
 	PlatSign string                         `json:"platSign,omitempty" mapstructure:"platSign"` //签名,需要校验. 要用rsa 公钥
@@ -29,8 +29,8 @@ type CheezeePayDepositResponse struct {
 
 type CheezeePayDepositResponseData struct {
 	OrderId string `json:"orderId" mapstructure:"orderId"`
-	Type    int    `json:"type" mapstructure:"type"` // 0 for new order, 1 for existing order
-	Url     string `json:"url" mapstructure:"url"`
+	Type    string `json:"type" mapstructure:"type"` // 0 for new order, 1 for existing order  (TODO 2是什么含义?)
+	Url     string `json:"url" mapstructure:"url"`   //这个是真正的psp收银台, 前端需要打开这个页面来支付
 }
 
 //--------------callback------------------------------
@@ -69,17 +69,17 @@ type CheezeePayDepositBackResp struct {
 //==============================================
 
 type CheezeePayWithdrawReq struct {
-	CustomerMerchantsId  string             `json:"customerMerchantsId" mapstructure:"customerMerchantsId"` //商户的userId
-	LegalCoin            string             `json:"legalCoin" mapstructure:"legalCoin"`                     //法定货币. 只支持: INR(印度卢比) IDR(印尼盾)
-	MerchantOrderId      string             `json:"merchantOrderId" mapstructure:"merchantOrderId"`         //商户订单号
-	DealAmount           string             `json:"dealAmount" mapstructure:"dealAmount"`
-	Language             string             `json:"language" mapstructure:"language"`                         //zh_hk Chinese；VI Vietnamese；en English；Indonesia Indonesian
+	CustomerMerchantsId  string             `json:"customerMerchantsId" mapstructure:"customerMerchantsId"`   //商户的userId
+	LegalCoin            string             `json:"legalCoin" mapstructure:"legalCoin"`                       //法定货币. 只支持: INR(印度卢比) IDR(印尼盾)
+	MerchantOrderId      string             `json:"merchantOrderId" mapstructure:"merchantOrderId"`           //商户订单号
+	DealAmount           string             `json:"dealAmount" mapstructure:"dealAmount"`                     //数量，必须是整数. 禁止浮点数，哪怕是2.00也不行 !!!!
 	TakerName            string             `json:"takerName" mapstructure:"takerName"`                       //[Bank Transfer(India)]
 	PayeeAccountType     string             `json:"payeeAccountType" mapstructure:"payeeAccountType"`         //Payment method, for example: [Bank Transfer(India)]
 	PayeeAccountTypeName string             `json:"payeeAccountTypeName" mapstructure:"payeeAccountTypeName"` //Payment method name, for example: Bank Transfer(India)
 	PayeeAccountInfos    []PayeeAccountInfo `json:"payeeAccountInfos" mapstructure:"payeeAccountInfos"`       //不参与签名计算！！！
 	//sdk来做
 	//MerchantsId string `json:"merchantsId" mapstructure:"merchantsId"`
+	//Language             string             `json:"language" mapstructure:"language"`                         //zh_hk Chinese；VI Vietnamese；en English；Indonesia Indonesian
 	//PushAddress string `json:"pushAddress" mapstructure:"pushAddress"` //回调地址
 	//TakerType string `json:"takerType" mapstructure:"takerType"` //Fixed: 2
 	//Coin        string `json:"coin" mapstructure:"coin"`           //Fixed: USDT

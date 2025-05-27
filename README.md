@@ -1,7 +1,7 @@
 文档
 =============
 https://pay-apidoc-en.cheezeebit.com/#cheezee-pay-api
-主要针对india支付.
+只支持INR 和 IDR. 默认 INR
 
 鉴权
 ==============

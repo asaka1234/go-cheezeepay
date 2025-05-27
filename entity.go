@@ -6,9 +6,9 @@ type CheezeePayDepositReq struct {
 	LegalCoin           string `json:"legalCoin" mapstructure:"legalCoin"`                     //法定货币. 只支持: INR(印度卢比) IDR(印尼盾)
 	MerchantOrderId     string `json:"merchantOrderId" mapstructure:"merchantOrderId"`         //商户订单号
 	DealAmount          string `json:"dealAmount" mapstructure:"dealAmount"`                   //数量
-	Language            string `json:"language" mapstructure:"language"`                       //zh_hk Chinese；VI Vietnamese；en English；Indonesia Indonesian
 	//以下sdk来赋值
 	//MerchantsId string `json:"merchantsId" mapstructure:"merchantsId"` //商户id
+	//Language            string `json:"language" mapstructure:"language"`                       //zh_hk Chinese；VI Vietnamese；en English；Indonesia Indonesian
 	//PushAddress string `json:"pushAddress" mapstructure:"pushAddress"` //回调地址
 	//TakerType   string `json:"takerType" mapstructure:"takerType"`     // Fixed: 2
 	//Coin        string `json:"coin" mapstructure:"coin"`               //Fixed: USDT

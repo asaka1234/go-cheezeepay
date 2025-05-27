@@ -1,13 +1,7 @@
 package utils
 
 import (
-	"crypto"
-	"crypto/rsa"
-	"crypto/sha256"
-	"crypto/x509"
-	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
@@ -69,32 +63,7 @@ func (util *CheezeebitRSASignatureUtil) Sign(message, privateKeyString string) (
 }
 
 func (util *CheezeebitRSASignatureUtil) Verify(message, signatureString, publicKeyString string) (bool, error) {
-	publicKeyBytes, err := base64.StdEncoding.DecodeString(publicKeyString)
-	if err != nil {
-		return false, err
-	}
 
-	// Parse public key
-	publicKey, err := x509.ParsePKIXPublicKey(publicKeyBytes)
-	if err != nil {
-		return false, err
-	}
+	return VerifySHA256RSA([]byte(message), publicKeyString, signatureString)
 
-	rsaPublicKey, ok := publicKey.(*rsa.PublicKey)
-	if !ok {
-		return false, errors.New("not an RSA public key")
-	}
-
-	signature, err := base64.StdEncoding.DecodeString(signatureString)
-	if err != nil {
-		return false, err
-	}
-
-	hashed := sha256.Sum256([]byte(message))
-	err = rsa.VerifyPKCS1v15(rsaPublicKey, crypto.SHA256, hashed[:], signature)
-	if err != nil {
-		return false, nil // Verification failed, but not an error condition
-	}
-
-	return true, nil
 }

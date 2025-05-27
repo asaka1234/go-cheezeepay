@@ -18,6 +18,7 @@ type Client struct {
 
 	ryClient *resty.Client
 	logger   utils.Logger
+	rsaUtil  utils.CheezeebitRSASignatureUtil
 }
 
 func NewClient(logger utils.Logger, merchantID string, rsaPublicKey, rsaPrivateKey, depositURL, withdrawURL, depositCallbackURL, withdrawCallbackURL string) *Client {
@@ -32,5 +33,6 @@ func NewClient(logger utils.Logger, merchantID string, rsaPublicKey, rsaPrivateK
 
 		ryClient: resty.New(), //client实例
 		logger:   logger,
+		rsaUtil:  utils.CheezeebitRSASignatureUtil{},
 	}
 }

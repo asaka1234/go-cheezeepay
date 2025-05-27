@@ -3,7 +3,6 @@ package go_cheezeepay
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/asaka1234/go-cheezeepay/utils"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -11,7 +10,7 @@ import (
 func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse, error) {
 
 	rawURL := cli.DepositURL
-	
+
 	// 1. 拿到请求参数，转为map
 	var signDataMap map[string]interface{}
 	mapstructure.Decode(req, &signDataMap)
@@ -23,7 +22,7 @@ func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse
 	signDataMap["language"] = "en" //TODO 先写死
 
 	// 2. 计算签名,补充参数
-	signStr, _ := utils.GetSign(signDataMap, cli.RSAPrivateKey) //私钥加密
+	signStr, _ := cli.rsaUtil.GetSign(signDataMap, cli.RSAPrivateKey) //私钥加密
 	signDataMap["platSign"] = signStr
 
 	var result CheezeePayDepositResponse
@@ -44,10 +43,13 @@ func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse
 	}
 
 	if result.Code == "000000" {
+		sign := result.PlatSign //收到的签名
+
 		var signResultMap map[string]interface{}
 		mapstructure.Decode(result, &signResultMap)
+		delete(signResultMap, "platSign") //去掉，用余下的来计算签名
 
-		verify, _ := utils.VerifySign(signResultMap, cli.RSAPublicKey) //私钥加密
+		verify, _ := cli.rsaUtil.VerifySign(signResultMap, cli.RSAPublicKey, sign) //私钥加密
 		if !verify {
 			return nil, fmt.Errorf("sign verify failed")
 		}

@@ -2,12 +2,11 @@ package utils
 
 import (
 	"crypto"
-	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
-	"encoding/pem"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/samber/lo"
@@ -16,129 +15,67 @@ import (
 	"strings"
 )
 
-const (
-	DATA = "data"
-)
+type CheezeebitRSASignatureUtil struct{}
 
-// Generate signature
-func GetSign(params map[string]interface{}, privateKey string) (string, error) {
-	delete(params, "sign")
-	textContent := GetContent(params)
-	fmt.Println("Signing content:", textContent)
-	return Sign(textContent, privateKey)
+func (util *CheezeebitRSASignatureUtil) GetSign(paramsMap map[string]interface{}, privateKey string) (string, error) {
+	delete(paramsMap, "platSign")
+	textContent := util.GetContent(paramsMap)
+	return util.Sign(textContent, privateKey)
 }
 
-// Verify the signature
-func VerifySign(params map[string]interface{}, publicKey string) (bool, error) {
-	platSign, ok := params["platSign"].(string)
-	if !ok {
-		return false, errors.New("platSign not found or not a string")
-	}
-	delete(params, "platSign")
-
-	textContent := GetContentNew(params)
-	fmt.Println("Signature Verification:", textContent)
-	return VerifySignature(textContent, platSign, publicKey)
+func (util *CheezeebitRSASignatureUtil) VerifySign(paramsMap map[string]interface{}, publicKey string, sign string) (bool, error) {
+	delete(paramsMap, "platSign")
+	textContent := util.GetContent(paramsMap)
+	return util.Verify(textContent, sign, publicKey)
 }
 
-//----------------------------
+//-------------------------------------------------------------
 
-// The string for the reception signature
-// 是value的拼接
-func GetContent(params map[string]interface{}) string {
-	keys := lo.Keys(params)
+func (util *CheezeebitRSASignatureUtil) GetContent(paramsMap map[string]interface{}) string {
+	// Get sorted keys
+	keys := lo.Keys(paramsMap)
 	sort.Strings(keys)
 
-	var builder strings.Builder
-	for _, name := range keys {
-		//遍历每一个key
-		if params[name] != nil && name != "payeeAccountInfos" {
-			if name == "agentOrderBatch" {
-				// builder.WriteString(JSON.toJSONString(params.get(name)))
+	var pairs []string
+	lo.ForEach(keys, func(x string, index int) {
+		value := ""
+		if x != "payeeAccountInfos" {
+			if x == "agentOrderBatch" {
+				valueByte, _ := json.Marshal(paramsMap[x])
+				value = string(valueByte)
 			} else {
-				//直接做value的拼接
-				builder.WriteString(cast.ToString(params[name]))
+				value = cast.ToString(paramsMap[x])
 			}
 		}
-	}
-	return builder.String()
-}
 
-// Spell the string of the signature to be verified
-func GetContentNew(params map[string]interface{}) string {
-	keys := lo.Keys(params)
-	sort.Strings(keys)
-
-	var builder strings.Builder
-	for _, name := range keys {
-		if !isEmpty(params[name]) {
-			if name == DATA {
-				if dataValue, ok := params[name].(map[string]interface{}); ok {
-					builder.WriteString(GetContentNew(dataValue))
-				} else {
-					builder.WriteString(fmt.Sprintf("%v", params[name]))
-				}
-			} else if name == "payeeAccountInfos" {
-				if strValue, ok := params[name].(string); ok {
-					builder.WriteString(strValue)
-				}
-			} else {
-				if params[name] != nil {
-					builder.WriteString(fmt.Sprintf("%v", params[name]))
-				}
-			}
+		if value != "" {
+			pairs = append(pairs, value)
 		}
-	}
-	return builder.String()
+	})
+
+	queryString := strings.Join(pairs, "")
+	fmt.Printf("[rawString]%s\n", queryString)
+
+	return queryString
 }
 
-// Check if value is empty
-func isEmpty(value interface{}) bool {
-	if value == nil {
-		return true
-	}
-	switch v := value.(type) {
-	case string:
-		return v == ""
-	case map[string]interface{}:
-		return len(v) == 0
-	case []interface{}:
-		return len(v) == 0
-	default:
-		return false
-	}
-}
+func (util *CheezeebitRSASignatureUtil) Sign(message, privateKeyString string) (string, error) {
 
-// Generate a signature using a private key
-func Sign(textContent, privateKeyStr string) (string, error) {
-
-	block, _ := pem.Decode([]byte(privateKeyStr))
-	if block == nil {
-		return "", errors.New("failed to parse PEM block containing the private key")
-	}
-
-	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	signResult, err := SignSHA256RSA([]byte(message), privateKeyString)
 	if err != nil {
-		return "", err
+		fmt.Printf("==sign===>%s\n", err.Error())
 	}
-
-	hashed := sha256.Sum256([]byte(textContent))
-	signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, hashed[:])
-	if err != nil {
-		return "", err
-	}
-
-	return base64.StdEncoding.EncodeToString(signature), nil
+	return signResult, nil
 }
 
-// Use public key to verify signature
-func VerifySignature(textContent, signStr, publicKeyStr string) (bool, error) {
-	block, _ := pem.Decode([]byte(publicKeyStr))
-	if block == nil {
-		return false, errors.New("failed to parse PEM block containing the public key")
+func (util *CheezeebitRSASignatureUtil) Verify(message, signatureString, publicKeyString string) (bool, error) {
+	publicKeyBytes, err := base64.StdEncoding.DecodeString(publicKeyString)
+	if err != nil {
+		return false, err
 	}
 
-	publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
+	// Parse public key
+	publicKey, err := x509.ParsePKIXPublicKey(publicKeyBytes)
 	if err != nil {
 		return false, err
 	}
@@ -148,15 +85,15 @@ func VerifySignature(textContent, signStr, publicKeyStr string) (bool, error) {
 		return false, errors.New("not an RSA public key")
 	}
 
-	signature, err := base64.StdEncoding.DecodeString(signStr)
+	signature, err := base64.StdEncoding.DecodeString(signatureString)
 	if err != nil {
 		return false, err
 	}
 
-	hashed := sha256.Sum256([]byte(textContent))
+	hashed := sha256.Sum256([]byte(message))
 	err = rsa.VerifyPKCS1v15(rsaPublicKey, crypto.SHA256, hashed[:], signature)
 	if err != nil {
-		return false, nil
+		return false, nil // Verification failed, but not an error condition
 	}
 
 	return true, nil

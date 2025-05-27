@@ -24,7 +24,7 @@ type CheezeePayDepositResponse struct {
 	Msg      string                         `json:"msg" mapstructure:"msg"`
 	Data     *CheezeePayDepositResponseData `json:"data,omitempty" mapstructure:"data"`
 	ErrorMsg string                         `json:"errorMsg,omitempty" mapstructure:"errorMsg"`
-	PlatSign *string                        `json:"platSign,omitempty" mapstructure:"platSign"` //签名,需要校验. 要用rsa 公钥
+	PlatSign string                         `json:"platSign,omitempty" mapstructure:"platSign"` //签名,需要校验. 要用rsa 公钥
 }
 
 type CheezeePayDepositResponseData struct {

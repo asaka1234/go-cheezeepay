@@ -21,9 +21,9 @@ func TestDeposit(t *testing.T) {
 
 func GenDepositRequestDemo() CheezeePayDepositReq {
 	return CheezeePayDepositReq{
-		CustomerMerchantsId: "1234", //商户uid
+		CustomerMerchantsId: "12345", //商户uid
 		LegalCoin:           "INR",
 		MerchantOrderId:     "8787791",
-		DealAmount:          "600", //不能浮点数
+		DealAmount:          "200", //不能浮点数
 	}
 }

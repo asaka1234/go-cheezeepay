@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
+	"reflect"
 	"sort"
 	"strings"
 )
@@ -18,7 +19,7 @@ func (util *CheezeebitRSASignatureUtil) GetSign(paramsMap map[string]interface{}
 
 func (util *CheezeebitRSASignatureUtil) VerifySign(paramsMap map[string]interface{}, publicKey string, sign string) (bool, error) {
 	delete(paramsMap, "platSign")
-	textContent := util.GetContent(paramsMap)
+	textContent := util.GetVerifyContent(paramsMap)
 	return util.Verify(textContent, sign, publicKey)
 }
 
@@ -52,6 +53,67 @@ func (util *CheezeebitRSASignatureUtil) GetContent(paramsMap map[string]interfac
 
 	return queryString
 }
+
+func (util *CheezeebitRSASignatureUtil) GetVerifyContent(params map[string]interface{}) string {
+	// 获取并排序键名
+	paramNames := lo.Keys(params)
+	sort.Strings(paramNames)
+
+	var builder strings.Builder
+
+	for _, name := range paramNames {
+		value := params[name]
+		if !isEmpty(value) {
+			switch name {
+			case "data":
+				if isMap(value) {
+					// 递归处理嵌套的 map
+					if nestedMap, ok := value.(map[string]interface{}); ok {
+						builder.WriteString(util.GetVerifyContent(nestedMap))
+					}
+				} else {
+					builder.WriteString(cast.ToString(value))
+				}
+			case "payeeAccountInfos":
+				// 只有 string 类型才参与签名
+				if _, ok := value.(string); ok {
+					builder.WriteString(cast.ToString(value))
+				}
+			default:
+				if value != nil {
+					builder.WriteString(cast.ToString(value))
+				}
+			}
+		}
+	}
+
+	return builder.String()
+}
+
+// 辅助函数：检查值是否为空
+func isEmpty(value interface{}) bool {
+	if value == nil {
+		return true
+	}
+
+	v := reflect.ValueOf(value)
+	switch v.Kind() {
+	case reflect.String, reflect.Array, reflect.Slice, reflect.Map:
+		return v.Len() == 0
+	default:
+		return false
+	}
+}
+
+// 辅助函数：检查是否是 map 类型
+func isMap(value interface{}) bool {
+	if value == nil {
+		return false
+	}
+	return reflect.TypeOf(value).Kind() == reflect.Map
+}
+
+//---------
 
 func (util *CheezeebitRSASignatureUtil) Sign(message, privateKeyString string) (string, error) {
 

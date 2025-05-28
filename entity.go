@@ -36,15 +36,16 @@ type CheezeePayDepositResponseData struct {
 //--------------callback------------------------------
 
 type CheezeePayDepositBackReq struct {
-	MerchantsOrderId string                        `json:"merchantsOrderId" mapstructure:"merchantsOrderId"` //商户订单号
-	OrderId          string                        `json:"orderId" mapstructure:"orderId"`                   //psp的订单号
-	MerchantId       string                        `json:"merchantId" mapstructure:"merchantId"`             //商户号
-	Data             *CheezeePayDepositBackReqData `json:"data,omitempty" mapstructure:"data"`
+	MerchantsOrderId string                       `json:"merchantsOrderId" mapstructure:"merchantsOrderId"` //商户订单号
+	OrderId          string                       `json:"orderId" mapstructure:"orderId"`                   //psp的订单号
+	MerchantId       string                       `json:"merchantId" mapstructure:"merchantId"`             //商户号
+	Data             CheezeePayDepositBackReqData `json:"data,omitempty" mapstructure:"data"`
+	PlatSign         string                       `json:"platSign,omitempty" mapstructure:"platSign"` //签名,需要校验. 要用rsa 公钥
 }
 
 type CheezeePayDepositBackReqData struct {
-	OrderId             string `json:"orderId" mapstructure:"orderId"`
-	Status              string `json:"status" mapstructure:"status"` //4 for success, 5 for failure, 6 for failure (user has not operated for 6 hours), 7 for failure (price not accepted), 9 for failure (refund)
+	OrderId             string `json:"orderId" mapstructure:"orderId"` //psp平台的订单号
+	Status              string `json:"status" mapstructure:"status"`   //4 for success, 5 for failure, 6 for failure (user has not operated for 6 hours), 7 for failure (price not accepted), 9 for failure (refund)
 	Coin                string `json:"coin" mapstructure:"coin"`
 	DealAmount          string `json:"dealAmount" mapstructure:"dealAmount"`
 	DealQuantity        string `json:"dealQuantity" mapstructure:"dealQuantity"`
@@ -53,12 +54,13 @@ type CheezeePayDepositBackReqData struct {
 	LegalCoin           string `json:"legalCoin" mapstructure:"legalCoin"`
 	Price               string `json:"price" mapstructure:"price"`
 	TakerFee            string `json:"takerFee" mapstructure:"takerFee"`
-	TakerId             string `json:"takerId" mapstructure:"takerId"`
+	TakerId             string `json:"takerId" mapstructure:"takerId"` //吃单人id
 	TakerName           string `json:"takerName" mapstructure:"takerName"`
 	TradeType           string `json:"tradeType" mapstructure:"tradeType"`
-	PayWayName          string `json:"payWayName" mapstructure:"payWayName"`
-	Side                string `json:"side" mapstructure:"side"`
+	PayWayName          string `json:"payWayName" mapstructure:"payWayName"` //付款方式
+	Side                string `json:"side" mapstructure:"side"`             //业务类型C2C
 	CustomerMerchantsId string `json:"customerMerchantsId" mapstructure:"customerMerchantsId"`
+	PlatSign            string `json:"platSign,omitempty" mapstructure:"platSign"` //签名,需要校验. 要用rsa 公钥
 }
 
 // 给callback的response
@@ -113,11 +115,12 @@ type CheezeePayWithdrawBackReq struct {
 	MerchantsOrderId string            `json:"merchantsOrderId" mapstructure:"merchantsOrderId"` //Merchant order number
 	MerchantId       string            `json:"merchantId" mapstructure:"merchantId"`
 	Data             WithdrawOrderData `json:"data" mapstructure:"data"`
+	PlatSign         string            `json:"platSign,omitempty" mapstructure:"platSign"` //签名,需要校验. 要用rsa 公钥
 }
 
 type WithdrawOrderData struct {
-	OrderId             string `json:"orderId" mapstructure:"orderId"`
-	Status              string `json:"status" mapstructure:"status"` //4 for success, 5 for failure, 6 for failure (user has not operated for 6 hours), 7 for failure (price not accepted), 9 for failure (refund)
+	OrderId             string `json:"orderId" mapstructure:"orderId"` //psp平台的订单号
+	Status              string `json:"status" mapstructure:"status"`   //4 for success, 5 for failure, 6 for failure (user has not operated for 6 hours), 7 for failure (price not accepted), 9 for failure (refund)
 	Coin                string `json:"coin" mapstructure:"coin"`
 	DealAmount          string `json:"dealAmount" mapstructure:"dealAmount"`
 	DealQuantity        string `json:"dealQuantity" mapstructure:"dealQuantity"`

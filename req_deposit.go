@@ -44,21 +44,19 @@ func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse
 		return nil, err
 	}
 
-	/*
-		TODO 返回的sign暂不做验签
-		if result.Code == "000000" {
-			sign := result.PlatSign //收到的签名
+	//验证签名
+	if result.Code == "000000" {
+		sign := result.PlatSign //收到的签名
 
-			var signResultMap map[string]interface{}
-			mapstructure.Decode(result, &signResultMap)
-			delete(signResultMap, "platSign") //去掉，用余下的来计算签名
+		var signResultMap map[string]interface{}
+		mapstructure.Decode(result, &signResultMap)
+		delete(signResultMap, "platSign") //去掉，用余下的来计算签名
 
-			verify, _ := cli.rsaUtil.VerifySign(signResultMap, cli.RSAPublicKey, sign) //私钥加密
-			if !verify {
-				return nil, fmt.Errorf("sign verify failed")
-			}
+		verify, _ := cli.rsaUtil.VerifySign(signResultMap, cli.RSAPublicKey, sign) //公钥解密
+		if !verify {
+			return nil, fmt.Errorf("sign verify failed")
 		}
-	*/
+	}
 
 	return &result, nil
 }

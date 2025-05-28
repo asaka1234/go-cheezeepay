@@ -24,6 +24,6 @@ func GenDepositRequestDemo() CheezeePayDepositReq {
 		CustomerMerchantsId: "12345", //商户uid
 		LegalCoin:           "INR",
 		MerchantOrderId:     "8787791",
-		DealAmount:          "200", //不能浮点数
+		DealAmount:          "200.00", //不能浮点数
 	}
 }

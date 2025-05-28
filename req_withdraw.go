@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/mitchellh/mapstructure"
+	"github.com/shopspring/decimal"
 )
 
 // https://pay-apidoc-en.cheezeebit.com/#p2p-payout-order
@@ -20,6 +21,9 @@ func (cli *Client) Withdraw(req CheezeePayWithdrawReq) (*CheezeePayWithdrawResp,
 	signDataMap["coin"] = "USDT"
 	signDataMap["tradeType"] = "1"
 	signDataMap["language"] = "en" //TODO 先写死
+	//为了确保amount必然是int整数,这里做一下强保障
+	amount, _ := decimal.NewFromString(req.DealAmount)
+	signDataMap["dealAmount"] = amount.StringFixed(0)
 
 	// 2. 计算签名,补充参数
 	signStr, _ := cli.rsaUtil.GetSign(signDataMap, cli.RSAPrivateKey) //私钥加密

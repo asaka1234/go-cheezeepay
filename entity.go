@@ -1,15 +1,15 @@
 package go_cheezeepay
 
 type CheezeePayInitParams struct {
-	MerchantId    string `json:"merchantId" mapstructure:"merchantId"`       // merchantId
-	RSAPublicKey  string `json:"rsaPublicKey" mapstructure:"rsaPublicKey"`   // 公钥
-	RSAPrivateKey string `json:"rsaPrivateKey" mapstructure:"rsaPrivateKey"` // 私钥
+	MerchantId    string `json:"merchantId" mapstructure:"merchantId" config:"merchantId"`          // merchantId
+	RSAPublicKey  string `json:"rsaPublicKey" mapstructure:"rsaPublicKey" config:"rsaPublicKey"`    // 公钥
+	RSAPrivateKey string `json:"rsaPrivateKey" mapstructure:"rsaPrivateKey" config:"rsaPrivateKey"` // 私钥
 
-	DepositUrl         string `json:"depositUrl" mapstructure:"depositUrl"`
-	DepositCallbackUrl string `json:"depositBackUrl" mapstructure:"depositBackUrl"`
+	DepositUrl         string `json:"depositUrl" mapstructure:"depositUrl" config:"depositUrl"`
+	DepositCallbackUrl string `json:"depositBackUrl" mapstructure:"depositBackUrl" config:"depositBackUrl"`
 
-	WithdrawUrl         string `json:"withdrawUrl" mapstructure:"withdrawUrl"`
-	WithdrawCallbackUrl string `json:"withdrawBackUrl" mapstructure:"withdrawBackUrl"`
+	WithdrawUrl         string `json:"withdrawUrl" mapstructure:"withdrawUrl" config:"withdrawUrl"`
+	WithdrawCallbackUrl string `json:"withdrawBackUrl" mapstructure:"withdrawBackUrl" config:"withdrawBackUrl"`
 }
 
 // ---------------------------------------------

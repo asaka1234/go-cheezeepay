@@ -6,7 +6,7 @@ import (
 )
 
 type Client struct {
-	params CheezeePayInitParams
+	Params CheezeePayInitParams
 
 	ryClient *resty.Client
 	logger   utils.Logger
@@ -15,7 +15,7 @@ type Client struct {
 
 func NewClient(logger utils.Logger, params CheezeePayInitParams) *Client {
 	return &Client{
-		params: params,
+		Params: params,
 
 		ryClient: resty.New(), //client实例
 		logger:   logger,

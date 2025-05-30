@@ -10,13 +10,13 @@ import (
 // https://pay-apidoc-en.cheezeebit.com/#p2p-payin-order
 func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse, error) {
 
-	rawURL := cli.DepositURL
+	rawURL := cli.params.DepositUrl
 
 	// 1. 拿到请求参数，转为map
 	var signDataMap map[string]interface{}
 	mapstructure.Decode(req, &signDataMap)
-	signDataMap["merchantsId"] = cli.MerchantID
-	signDataMap["pushAddress"] = cli.DepositCallbackURL
+	signDataMap["merchantsId"] = cli.params.MerchantId
+	signDataMap["pushAddress"] = cli.params.DepositCallbackUrl
 	signDataMap["takerType"] = "2"
 	signDataMap["coin"] = "USDT"
 	signDataMap["tradeType"] = "2"
@@ -26,7 +26,7 @@ func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse
 	signDataMap["dealAmount"] = amount.StringFixed(0)
 
 	// 2. 计算签名,补充参数
-	signStr, _ := cli.rsaUtil.GetSign(signDataMap, cli.RSAPrivateKey) //私钥加密
+	signStr, _ := cli.rsaUtil.GetSign(signDataMap, cli.params.RSAPrivateKey) //私钥加密
 	signDataMap["platSign"] = signStr
 
 	fmt.Printf("sign: %s\n", signStr)
@@ -56,7 +56,7 @@ func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse
 		mapstructure.Decode(result, &signResultMap)
 		delete(signResultMap, "platSign") //去掉，用余下的来计算签名
 
-		verify, _ := cli.rsaUtil.VerifySign(signResultMap, cli.RSAPublicKey, sign) //公钥解密
+		verify, _ := cli.rsaUtil.VerifySign(signResultMap, cli.params.RSAPublicKey, sign) //公钥解密
 		if !verify {
 			return nil, fmt.Errorf("sign verify failed")
 		}

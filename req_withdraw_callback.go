@@ -14,7 +14,7 @@ func (cli *Client) WithdrawCallback(req CheezeePayWithdrawBackReq, processor fun
 	mapstructure.Decode(req, &signResultMap)
 	delete(signResultMap, "platSign") //去掉，用余下的来计算签名
 
-	verify, _ := cli.rsaUtil.VerifySign(signResultMap, cli.RSAPublicKey, sign) //私钥加密
+	verify, _ := cli.rsaUtil.VerifySign(signResultMap, cli.params.RSAPublicKey, sign) //私钥加密
 	if !verify {
 		return fmt.Errorf("sign verify failed")
 	}

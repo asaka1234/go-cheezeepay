@@ -1,15 +1,15 @@
 package go_cheezeepay
 
 type CheezeePayInitParams struct {
-	MerchantId    string `json:"merchantId" mapstructure:"merchantId" config:"merchantId"`          // merchantId
-	RSAPublicKey  string `json:"rsaPublicKey" mapstructure:"rsaPublicKey" config:"rsaPublicKey"`    // 公钥
-	RSAPrivateKey string `json:"rsaPrivateKey" mapstructure:"rsaPrivateKey" config:"rsaPrivateKey"` // 私钥
+	MerchantId    string `json:"merchantId" mapstructure:"merchantId" config:"merchantId" yaml:"merchantId"`             // merchantId
+	RSAPublicKey  string `json:"rsaPublicKey" mapstructure:"rsaPublicKey" config:"rsaPublicKey" yaml:"rsaPublicKey"`     // 公钥
+	RSAPrivateKey string `json:"rsaPrivateKey" mapstructure:"rsaPrivateKey" config:"rsaPrivateKey" yaml:"rsaPrivateKey"` // 私钥
 
-	DepositUrl         string `json:"depositUrl" mapstructure:"depositUrl" config:"depositUrl"`
-	DepositCallbackUrl string `json:"depositBackUrl" mapstructure:"depositBackUrl" config:"depositBackUrl"`
+	DepositUrl         string `json:"depositUrl" mapstructure:"depositUrl" config:"depositUrl" yaml:"depositUrl"`
+	DepositCallbackUrl string `json:"depositBackUrl" mapstructure:"depositBackUrl" config:"depositBackUrl" yaml:"depositBackUrl"`
 
-	WithdrawUrl         string `json:"withdrawUrl" mapstructure:"withdrawUrl" config:"withdrawUrl"`
-	WithdrawCallbackUrl string `json:"withdrawBackUrl" mapstructure:"withdrawBackUrl" config:"withdrawBackUrl"`
+	WithdrawUrl         string `json:"withdrawUrl" mapstructure:"withdrawUrl" config:"withdrawUrl" yaml:"withdrawUrl"`
+	WithdrawCallbackUrl string `json:"withdrawBackUrl" mapstructure:"withdrawBackUrl" config:"withdrawBackUrl" yaml:"withdrawBackUrl"`
 }
 
 // ---------------------------------------------

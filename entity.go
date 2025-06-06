@@ -132,7 +132,7 @@ type CheezeePayWithdrawBackReq struct {
 
 type WithdrawOrderData struct {
 	OrderId             string `json:"orderId" mapstructure:"orderId"` //psp平台的订单号
-	Status              string `json:"status" mapstructure:"status"`   //4 for success, 5 for failure, 6 for failure (user has not operated for 6 hours), 7 for failure (price not accepted), 9 for failure (refund)
+	Status              string `json:"status" mapstructure:"status"`   //状态: 4成功  5失败 7失败（价格不接受）9失败（退单）
 	Coin                string `json:"coin" mapstructure:"coin"`
 	DealAmount          string `json:"dealAmount" mapstructure:"dealAmount"`
 	DealQuantity        string `json:"dealQuantity" mapstructure:"dealQuantity"`

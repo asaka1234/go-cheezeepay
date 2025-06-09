@@ -6,7 +6,7 @@ import (
 )
 
 type Client struct {
-	Params CheezeePayInitParams
+	Params *CheezeePayInitParams
 
 	ryClient  *resty.Client
 	logger    utils.Logger
@@ -14,7 +14,7 @@ type Client struct {
 	rsaUtil   utils.CheezeebitRSASignatureUtil
 }
 
-func NewClient(logger utils.Logger, params CheezeePayInitParams) *Client {
+func NewClient(logger utils.Logger, params *CheezeePayInitParams) *Client {
 	return &Client{
 		Params: params,
 

@@ -8,17 +8,23 @@ import (
 type Client struct {
 	Params CheezeePayInitParams
 
-	ryClient *resty.Client
-	logger   utils.Logger
-	rsaUtil  utils.CheezeebitRSASignatureUtil
+	ryClient  *resty.Client
+	logger    utils.Logger
+	debugMode bool
+	rsaUtil   utils.CheezeebitRSASignatureUtil
 }
 
 func NewClient(logger utils.Logger, params CheezeePayInitParams) *Client {
 	return &Client{
 		Params: params,
 
-		ryClient: resty.New(), //client实例
-		logger:   logger,
-		rsaUtil:  utils.CheezeebitRSASignatureUtil{},
+		ryClient:  resty.New(), //client实例
+		logger:    logger,
+		debugMode: false,
+		rsaUtil:   utils.CheezeebitRSASignatureUtil{},
 	}
+}
+
+func (cli *Client) SetDebugModel(debugModel bool) {
+	cli.debugMode = debugModel
 }

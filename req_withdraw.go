@@ -36,6 +36,7 @@ func (cli *Client) Withdraw(req CheezeePayWithdrawReq) (*CheezeePayWithdrawResp,
 		R().
 		SetBody(signDataMap).
 		SetHeaders(getHeaders()).
+		SetDebug(cli.debugMode).
 		SetResult(&result).
 		SetError(&result).
 		Post(rawURL)

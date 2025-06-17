@@ -73,7 +73,7 @@ type CheezeePayDepositBackReqData struct {
 	PayWayName          string `json:"payWayName" mapstructure:"payWayName"` //付款方式
 	Side                string `json:"side" mapstructure:"side"`             //业务类型C2C
 	CustomerMerchantsId string `json:"customerMerchantsId" mapstructure:"customerMerchantsId"`
-	PlatSign            string `json:"platSign,omitempty" mapstructure:"platSign"` //签名,需要校验. 要用rsa 公钥
+	//PlatSign            string `json:"platSign,omitempty" mapstructure:"platSign"` //签名,需要校验. 要用rsa 公钥
 }
 
 // 给callback的response

@@ -27,7 +27,9 @@ func (cli *Client) DepositCallback(req CheezeePayDepositBackReq, processor func(
 	if err != nil {
 		return err
 	}
-	return viper.Unmarshal(req.Data)
+	var data CheezeePayDepositBackReqData
+	viper.Unmarshal(&data)
+	req.Data = data
 
 	//开始处理
 	return processor(req)

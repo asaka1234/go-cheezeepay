@@ -27,8 +27,10 @@ func (cli *Client) WithdrawCallback(req CheezeePayWithdrawBackReq, processor fun
 	if err != nil {
 		return err
 	}
-	return viper.Unmarshal(req.Data)
-	
+	var data WithdrawOrderData
+	viper.Unmarshal(&data)
+	req.Data = data
+
 	//开始处理
 	return processor(req)
 }

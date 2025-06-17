@@ -48,11 +48,12 @@ type CheezeePayDepositResponseData struct {
 //--------------callback------------------------------
 
 type CheezeePayDepositBackReq struct {
-	MerchantsOrderId string                       `json:"merchantsOrderId" mapstructure:"merchantsOrderId"` //商户订单号
-	OrderId          string                       `json:"orderId" mapstructure:"orderId"`                   //psp的订单号
-	MerchantId       string                       `json:"merchantId" mapstructure:"merchantId"`             //商户号
-	Data             CheezeePayDepositBackReqData `json:"data,omitempty" mapstructure:"data"`
-	PlatSign         string                       `json:"platSign,omitempty" mapstructure:"platSign"` //签名,需要校验. 要用rsa 公钥
+	MerchantsOrderId string                       `json:"merchantsOrderId" mapstructure:"merchantsOrderId"`   //商户订单号
+	OrderId          string                       `json:"orderId" mapstructure:"orderId"`                     //psp的订单号
+	MerchantId       string                       `json:"merchantId" mapstructure:"merchantId"`               //商户号
+	DataRaw          string                       `json:"data,omitempty" mapstructure:"data"`                 //传过来是string
+	Data             CheezeePayDepositBackReqData `json:"dataOptimize,omitempty" mapstructure:"dataOptimize"` //解析过之后的
+	PlatSign         string                       `json:"platSign,omitempty" mapstructure:"platSign"`         //签名,需要校验. 要用rsa 公钥
 }
 
 type CheezeePayDepositBackReqData struct {
@@ -126,8 +127,9 @@ type CheezeePayWithdrawBackReq struct {
 	OrderId          string            `json:"orderId" mapstructure:"orderId"`                   //Platform order number.
 	MerchantsOrderId string            `json:"merchantsOrderId" mapstructure:"merchantsOrderId"` //Merchant order number
 	MerchantId       string            `json:"merchantId" mapstructure:"merchantId"`
-	Data             WithdrawOrderData `json:"data" mapstructure:"data"`
-	PlatSign         string            `json:"platSign,omitempty" mapstructure:"platSign"` //签名,需要校验. 要用rsa 公钥
+	DataRaw          string            `json:"data" mapstructure:"data"`                           //原始字符串
+	Data             WithdrawOrderData `json:"dataOptimize,omitempty" mapstructure:"dataOptimize"` //解析过之后的
+	PlatSign         string            `json:"platSign,omitempty" mapstructure:"platSign"`         //签名,需要校验. 要用rsa 公钥
 }
 
 type WithdrawOrderData struct {

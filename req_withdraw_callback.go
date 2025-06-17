@@ -1,8 +1,10 @@
 package go_cheezeepay
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/viper"
 )
 
 // https://pay-apidoc-en.cheezeebit.com/#p2p-payout-notification
@@ -19,6 +21,14 @@ func (cli *Client) WithdrawCallback(req CheezeePayWithdrawBackReq, processor fun
 		return fmt.Errorf("sign verify failed")
 	}
 
+	//映射一下
+	viper.SetConfigType("yaml")
+	err := viper.ReadConfig(bytes.NewBuffer([]byte(req.DataRaw)))
+	if err != nil {
+		return err
+	}
+	return viper.Unmarshal(req.Data)
+	
 	//开始处理
 	return processor(req)
 }

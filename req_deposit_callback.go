@@ -22,7 +22,7 @@ func (cli *Client) DepositCallback(req CheezeePayDepositBackReq, processor func(
 	}
 
 	//映射一下
-	viper.SetConfigType("yaml")
+	viper.SetConfigType("json")
 	err := viper.ReadConfig(bytes.NewBuffer([]byte(req.DataRaw)))
 	if err != nil {
 		return err

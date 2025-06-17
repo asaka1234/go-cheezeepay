@@ -57,19 +57,19 @@ type CheezeePayDepositBackReq struct {
 }
 
 type CheezeePayDepositBackReqData struct {
-	OrderId             string `json:"orderId" mapstructure:"orderId"` //psp平台的订单号
-	Status              string `json:"status" mapstructure:"status"`   //状态: 4成功  5失败 6失败（用户6小时未操作失败）7失败（价格不接受）9失败（退单）
+	OrderId             int64  `json:"orderId" mapstructure:"orderId"` //psp平台的订单号
+	Status              int    `json:"status" mapstructure:"status"`   //状态: 4成功  5失败 6失败（用户6小时未操作失败）7失败（价格不接受）9失败（退单）
 	Coin                string `json:"coin" mapstructure:"coin"`
 	DealAmount          string `json:"dealAmount" mapstructure:"dealAmount"`
 	DealQuantity        string `json:"dealQuantity" mapstructure:"dealQuantity"`
-	EntrustOrderId      string `json:"entrustOrderId" mapstructure:"entrustOrderId"`
+	EntrustOrderId      int64  `json:"entrustOrderId" mapstructure:"entrustOrderId"`
 	FeeCoin             string `json:"feeCoin" mapstructure:"feeCoin"`
 	LegalCoin           string `json:"legalCoin" mapstructure:"legalCoin"`
 	Price               string `json:"price" mapstructure:"price"`
 	TakerFee            string `json:"takerFee" mapstructure:"takerFee"`
 	TakerId             string `json:"takerId" mapstructure:"takerId"` //吃单人id
 	TakerName           string `json:"takerName" mapstructure:"takerName"`
-	TradeType           string `json:"tradeType" mapstructure:"tradeType"`
+	TradeType           int    `json:"tradeType" mapstructure:"tradeType"`
 	PayWayName          string `json:"payWayName" mapstructure:"payWayName"` //付款方式
 	Side                string `json:"side" mapstructure:"side"`             //业务类型C2C
 	CustomerMerchantsId string `json:"customerMerchantsId" mapstructure:"customerMerchantsId"`
@@ -133,19 +133,19 @@ type CheezeePayWithdrawBackReq struct {
 }
 
 type WithdrawOrderData struct {
-	OrderId             string `json:"orderId" mapstructure:"orderId"` //psp平台的订单号
-	Status              string `json:"status" mapstructure:"status"`   //状态: 4成功  5失败 7失败（价格不接受）9失败（退单）
+	OrderId             int64  `json:"orderId" mapstructure:"orderId"` //psp平台的订单号
+	Status              int    `json:"status" mapstructure:"status"`   //状态: 4成功  5失败 7失败（价格不接受）9失败（退单）
 	Coin                string `json:"coin" mapstructure:"coin"`
 	DealAmount          string `json:"dealAmount" mapstructure:"dealAmount"`
 	DealQuantity        string `json:"dealQuantity" mapstructure:"dealQuantity"`
-	EntrustOrderId      string `json:"entrustOrderId" mapstructure:"entrustOrderId"`
+	EntrustOrderId      int64  `json:"entrustOrderId" mapstructure:"entrustOrderId"`
 	FeeCoin             string `json:"feeCoin" mapstructure:"feeCoin"`
 	LegalCoin           string `json:"legalCoin" mapstructure:"legalCoin"`
 	Price               string `json:"price" mapstructure:"price"`
 	TakerFee            string `json:"takerFee" mapstructure:"takerFee"`
 	TakerId             string `json:"takerId" mapstructure:"takerId"`
 	TakerName           string `json:"takerName" mapstructure:"takerName"`
-	TradeType           string `json:"tradeType" mapstructure:"tradeType"`
+	TradeType           int    `json:"tradeType" mapstructure:"tradeType"`
 	PayWayName          string `json:"payWayName" mapstructure:"payWayName"`
 	Side                string `json:"side" mapstructure:"side"`
 	CustomerMerchantsId string `json:"customerMerchantsId" mapstructure:"customerMerchantsId"` ////商户的userId

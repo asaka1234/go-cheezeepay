@@ -40,9 +40,9 @@ type CheezeePayDepositResponse struct {
 }
 
 type CheezeePayDepositResponseData struct {
-	OrderId string `json:"orderId" mapstructure:"orderId"`
-	Type    string `json:"type" mapstructure:"type"` // 0 for new order, 1 for existing order  (TODO 2是什么含义?)
-	Url     string `json:"url" mapstructure:"url"`   //这个是真正的psp收银台, 前端需要打开这个页面来支付
+	OrderId string `json:"orderId" mapstructure:"orderId"` //psp订单号
+	Type    string `json:"type" mapstructure:"type"`       // 0 for new order, 1 for existing order
+	Url     string `json:"url" mapstructure:"url"`         //这个是真正的psp收银台, 前端需要打开这个页面来支付
 }
 
 //--------------callback------------------------------

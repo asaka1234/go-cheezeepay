@@ -155,3 +155,11 @@ type WithdrawOrderData struct {
 type CheezeePayWithdrawBackResp struct {
 	Code int `json:"code"` // 响应状态码  200成功
 }
+
+// ========================
+type PayeeAccountInfosFormField struct {
+	Field    string `json:"field"`
+	Type     string `json:"type"`
+	Required bool   `json:"required"`
+	Value    string `json:"value"`
+}

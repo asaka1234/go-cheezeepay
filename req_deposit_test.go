@@ -7,10 +7,26 @@ import (
 	"testing"
 )
 
-func TestDeposit(t *testing.T) {
+type VLog struct {
+}
 
+func (l VLog) Debugf(format string, args ...interface{}) {
+	fmt.Printf(format+"\n", args...)
+}
+func (l VLog) Infof(format string, args ...interface{}) {
+	fmt.Printf(format+"\n", args...)
+}
+func (l VLog) Warnf(format string, args ...interface{}) {
+	fmt.Printf(format+"\n", args...)
+}
+func (l VLog) Errorf(format string, args ...interface{}) {
+	fmt.Printf(format+"\n", args...)
+}
+
+func TestDeposit(t *testing.T) {
+	vlog := VLog{}
 	//构造client
-	cli := NewClient(nil, &CheezeePayInitParams{MERCHANT_ID, RSA_PUBLIC_KEY, RSA_PRIVATE_KEY, DEPOST_URL, DEPOST_BACK_URL, WITHDRAW_URL, WITHDRAW_BACK_URL})
+	cli := NewClient(vlog, &CheezeePayInitParams{MERCHANT_ID, RSA_PUBLIC_KEY, RSA_PRIVATE_KEY, DEPOST_URL, DEPOST_BACK_URL, WITHDRAW_URL, WITHDRAW_BACK_URL})
 
 	//发请求
 	resp, err := cli.Deposit(GenDepositRequestDemo())

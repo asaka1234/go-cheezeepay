@@ -3,6 +3,8 @@ package go_cheezeepay
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/asaka1234/go-cheezeepay/utils"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 )
@@ -29,8 +31,6 @@ func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse
 	signStr, _ := cli.rsaUtil.GetSign(signDataMap, cli.Params.RSAPrivateKey) //私钥加密
 	signDataMap["platSign"] = signStr
 
-	fmt.Printf("sign: %s\n", signStr)
-
 	var result CheezeePayDepositResponse
 
 	resp, err := cli.ryClient.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}).
@@ -43,10 +43,21 @@ func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse
 		SetError(&result).
 		Post(rawURL)
 
-	fmt.Printf("result: %s\n", string(resp.Body()))
+	restLog, _ := jsoniter.ConfigCompatibleWithStandardLibrary.Marshal(utils.GetRestyLog(resp))
+	cli.logger.Infof("PSPResty#cheezeepay#deposit->%+v", string(restLog))
 
 	if err != nil {
 		return nil, err
+	}
+
+	if resp.StatusCode() != 200 {
+		//反序列化错误会在此捕捉
+		return nil, fmt.Errorf("status code: %d", resp.StatusCode())
+	}
+
+	if resp.Error() != nil {
+		//反序列化错误会在此捕捉
+		return nil, fmt.Errorf("%v, body:%s", resp.Error(), resp.Body())
 	}
 
 	/*

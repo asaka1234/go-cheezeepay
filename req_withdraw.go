@@ -44,7 +44,7 @@ func (cli *Client) Withdraw(req CheezeePayWithdrawReq) (*CheezeePayWithdrawResp,
 		Post(rawURL)
 
 	restLog, _ := jsoniter.ConfigCompatibleWithStandardLibrary.Marshal(utils.GetRestyLog(resp))
-	cli.logger.Infof("PSPResty#cheezeepay#withdraw->%+v", string(restLog))
+	cli.logger.Infof("PSPResty#cheezeepay#withdraw->%s", string(restLog))
 
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (cli *Client) Withdraw(req CheezeePayWithdrawReq) (*CheezeePayWithdrawResp,
 
 	if resp.Error() != nil {
 		//反序列化错误会在此捕捉
-		return nil, fmt.Errorf("%v, body:%s", resp.Error(), resp.Body())
+		return nil, fmt.Errorf("%v", resp.Error())
 	}
 
 	//验证签名

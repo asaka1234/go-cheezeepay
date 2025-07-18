@@ -44,7 +44,7 @@ func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse
 		Post(rawURL)
 
 	restLog, _ := jsoniter.ConfigCompatibleWithStandardLibrary.Marshal(utils.GetRestyLog(resp))
-	cli.logger.Infof("PSPResty#cheezeepay#deposit->%+v", string(restLog))
+	cli.logger.Infof("PSPResty#cheezeepay#deposit->%s", string(restLog))
 
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (cli *Client) Deposit(req CheezeePayDepositReq) (*CheezeePayDepositResponse
 
 	if resp.Error() != nil {
 		//反序列化错误会在此捕捉
-		return nil, fmt.Errorf("%v, body:%s", resp.Error(), resp.Body())
+		return nil, fmt.Errorf("%v", resp.Error())
 	}
 
 	/*
